@@ -46,14 +46,14 @@ func main() {
 }
 
 func RegisterPage(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-
+	// Make http method Post
 	if r.Method == http.MethodPost {
 		username := r.FormValue("username")
 		password := r.FormValue("password")
 
+		// Check if user exists
 		var exists bool
 		err := db.QueryRow("SELECT username FROM users WHERE username = ?", username).Scan(&exists)
-
 		switch {
 
 		case err == sql.ErrNoRows:
@@ -93,8 +93,8 @@ func RegisterPage(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 }
 
 func LoginPage(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-
-	if r.Method != "POST" {
+	// Make http method Post
+	if r.Method == http.MethodPost {
 		username := r.FormValue("username")
 		password := r.FormValue("password")
 
@@ -103,14 +103,12 @@ func LoginPage(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 		// Scan the input of username and find it in database
 		err := db.QueryRow("SELECT username, password FROM users WHERE username=?", username).Scan(&databaseUsername, &databasePassword)
-
 		if err != nil {
 			fmt.Println("User already exists", err)
 		}
 
 		// Compare the hashed password from database to input password
 		err = bcrypt.CompareHashAndPassword([]byte(databasePassword), []byte(password))
-
 		if err != nil {
 			fmt.Println("Password is incorrect", err)
 			return
